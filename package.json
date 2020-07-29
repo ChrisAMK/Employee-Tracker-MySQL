@@ -1,0 +1,23 @@
+{
+  "name": "w12-employee-tracker-mysql",
+  "version": "1.0.0",
+  "description": "w12 employee tracker",
+  "main": "cms.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChrisAMK/Employee-Tracker-MySQL.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ChrisAMK/Employee-Tracker-MySQL/issues"
+  },
+  "homepage": "https://github.com/ChrisAMK/Employee-Tracker-MySQL#readme",
+  "dependencies": {
+    "inquirer": "^7.3.3",
+    "mysql": "^2.18.1"
+  }
+}
