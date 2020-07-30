@@ -11,7 +11,23 @@ var connectionProperties = {
 
 var connection = mysql.createConnection(connectionProperties)
 
-
+var roleQuestions = [
+    {
+        type: 'input',
+        name: 'title',
+        message: 'Enter the name of the job title you would like to add:',
+    },
+    {
+        type: 'input',
+        name: 'salary',
+        message: 'What is this salary for this job?',
+    },
+    {
+        type: 'input',
+        name: 'dept',
+        message: 'Select a department where this job belongs to:'
+    }
+]
 
 var questions = {
     message: "What would you like to do?",
@@ -112,8 +128,18 @@ const viewAllEmployees = () => {
     })
 }
 
+const viewAllDepartments = () => {
+    connection.query("SELECT * FROM department", function (err, data) {
+        if (err) {
+            console.log(err)
+        }
+        console.table(data);
+        promptUser()
+    })
+}
+
 const viewAllRoles = () => {
-    connection.query("SELECT * FROM roles", function (err, data) {
+    connection.query("SELECT * FROM role", function (err, data) {
         if (err) {
             console.log(err)
         }
@@ -132,4 +158,31 @@ const addEmployee = () => {
         })
     })
     
+}
+
+const addDepartment = () => {
+    inquirer.prompt({
+        type: "input",
+        message: "What is the name of your new Department? ",
+        name: "department"
+    }).then(function(response) {
+        connection.query("INSERT INTO department (name) VALUES (?)", response.department, function(err, res) {
+            if (err) throw err;
+            console.log("department added!")
+            promptUser();
+        })
+
+        // View Departments!
+    })
+}
+
+const addRole = () => {
+    console.log("in Progress")
+    inquirer.prompt(roleQuestions).then(function(response) {
+        connection.query("INSERT INTO role (title) VALUES (?)", response.title, function(err, res) {
+            if (err) throw err;
+            console.log("role added!")
+            promptUser();
+        })
+    })
 }
