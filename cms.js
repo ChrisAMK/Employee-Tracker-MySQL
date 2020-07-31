@@ -1,5 +1,6 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
+const { prompt } = require("inquirer");
 
 var connectionProperties = {
     host: "localhost",
@@ -39,6 +40,12 @@ var questions = {
         "Add an Employee",
         "Add a Department",
         "Add Role",
+        "Remove an Employee",
+        "Remove a Department",
+        "Remove a Role",
+        "Update an Employee's ID",
+        "Update a Department's ID",
+        "Update a Role's ID",
         "Update Employee Role",
         "Exit"
     ],
@@ -74,8 +81,8 @@ connection.connect(function (err) {
     promptUser()
 })
 
-const promptUser = () => {
-    inquirer.prompt(questions).then(function(response) {
+const promptUser = async () => {
+    inquirer.prompt(questions).then(async function(response) {
         const {userChoice} = response
         console.log(userChoice)
         switch (userChoice) {
@@ -107,6 +114,30 @@ const promptUser = () => {
                 updateEmployeeRole()
                 break;
 
+            case "Remove an Employee":
+                removeEmployee();
+                break;
+
+            case "Remove a Department":
+                removeDepartment();
+                break;
+
+            case "Remove a Role":
+                removeRole();
+                break;
+
+            case "Update an Employee's ID":
+                updateEmployeeId();
+                break;
+
+            case "Update a Department's ID":
+                updateDepartmentId();
+                break;
+
+            case "Update a Role's ID":
+                updateRoleId();
+                break;
+
             case "Exit":
                 connection.end()
                 break;
@@ -119,7 +150,7 @@ const promptUser = () => {
 }
 
 const viewAllEmployees = () => {
-    connection.query("SELECT * FROM employee", function (err, data) {
+    connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, dept.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department dept on role.department_id = dept.id LEFT JOIN employee manager on manager.id = employee.manager_id;", function (err, data) {
         if (err) {
             console.log(err)
         }
@@ -154,7 +185,7 @@ const addEmployee = () => {
         connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [firstName, lastName, roleId, managerId], function(err, data) {
             if (err) throw err;
             console.table("Employee inserted into Table")
-            promptUser()
+            promptUser();
         })
     })
     
@@ -179,10 +210,160 @@ const addDepartment = () => {
 const addRole = () => {
     console.log("in Progress")
     inquirer.prompt(roleQuestions).then(function(response) {
-        connection.query("INSERT INTO role (title) VALUES (?)", response.title, function(err, res) {
+        connection.query("INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)", [response.title, response.salary, response.dept], function(err, res) {
             if (err) throw err;
             console.log("role added!")
             promptUser();
         })
+    })
+}
+
+function removeEmployee() {
+    // viewAllEmployees();
+    inquirer.prompt({
+        type: "input",
+        message: "Which employee do you want to remove, select ID",
+        name: "removedEmployee"
+    }).then(function(response) {
+        let query = "DELETE FROM employee WHERE id="
+        let updatedQuery = query + parseInt(response.removedEmployee)
+        console.log(updatedQuery)
+        connection.query(updatedQuery, function(err, response) {
+            if (err) throw err;
+            console.log("Employee Deleted")
+        })
+        promptUser()
+    })
+}
+
+function removeDepartment() {
+    inquirer.prompt({
+        type: "input",
+        message: "Which department do you want to remove, Select ID",
+        name: "removedDept"
+    }).then(function (response) {
+        let query = "DELETE FROM department where id=";
+        let updatedQuery = query + parseInt(response.removedDept);
+        connection.query(updatedQuery, function(err, response) {
+            if (err) throw err;
+            console.log("Department Deleted")
+        })
+        promptUser()
+    })
+}
+
+function removeRole() {
+    inquirer.prompt({
+        type: "input",
+        message: "Which Role do you want to remove?, Select ID",
+        name: "removedRole"
+    }).then(function(response) {
+        let query = "DELETE FROM role where id=";
+        let updatedQuery = query + parseInt(response.removedRole);
+        connection.query(query, function(err, response) {
+            if (err) throw err;
+            console.log("Role Removed")
+        })
+        promptUser()
+    })
+}
+/////
+function updateEmployeeId() {
+    inquirer.prompt([{
+        type: "input",
+        message: "Which employee's id do you want to change?",
+        name: "priorTarget"
+    },
+    {
+        type: "input",
+        message: "What id do you want to change to?",
+        name: "laterTarget"
+
+    }]).then(function(response) {
+        let priorTarget = parseInt(response.priorTarget);
+        let laterTarget = parseInt(response.laterTarget);
+        let query2 = "UPDATE employee SET employee.id="
+        let query3 = " WHERE employee.id="
+        let updatedQuery = query2 + parseInt(laterTarget) + query3 + parseInt(priorTarget)
+        console.log(updatedQuery)
+        connection.query(updatedQuery, function(err, response) {
+            if (err) throw err;
+        })
+        promptUser()
+    })
+}
+
+function updateDepartmentId() {
+    inquirer.prompt([{
+        type: "input",
+        message: "Which Department's id do you want to change?",
+        name: "priorTarget"
+    },
+    {
+        type: "input",
+        message: "What id do you want to change to?",
+        name: "laterTarget"
+
+    }]).then(function(response) {
+        let priorTarget = parseInt(response.priorTarget);
+        let laterTarget = parseInt(response.laterTarget);
+        let query2 = "UPDATE department SET department.id="
+        let query3 = " WHERE department.id="
+        let updatedQuery = query2 + parseInt(laterTarget) + query3 + parseInt(priorTarget)
+        console.log(updatedQuery)
+        connection.query(updatedQuery, function(err, response) {
+            if (err) throw err;
+        })
+        promptUser()
+    })
+}
+
+function updateRoleId() {
+    inquirer.prompt([{
+        type: "input",
+        message: "Which Role's id do you want to change?",
+        name: "priorTarget"
+    },
+    {
+        type: "input",
+        message: "What id do you want to change to?",
+        name: "laterTarget"
+
+    }]).then(function(response) {
+        let priorTarget = parseInt(response.priorTarget);
+        let laterTarget = parseInt(response.laterTarget);
+        let query2 = "UPDATE role SET role.id="
+        let query3 = " WHERE role.id="
+        let updatedQuery = query2 + parseInt(laterTarget) + query3 + parseInt(priorTarget)
+        console.log(updatedQuery)
+        connection.query(updatedQuery, function(err, response) {
+            if (err) throw err;
+        })
+        promptUser()
+    })
+}
+
+function updateEmployeeRole() {
+    inquirer.prompt([{
+        type: "input",
+        message: "Which employee do you want to change Role's?",
+        name: "priorTarget"
+    },
+    {
+        type: "input",
+        message: "Which Role do you want to change to?",
+        name: "laterTarget"
+
+    }]).then(function(response) {
+        let priorTarget = parseInt(response.priorTarget);
+        let laterTarget = parseInt(response.laterTarget);
+        let query2 = "UPDATE employee SET employee.id="
+        let query3 = " WHERE employee.id="
+        let updatedQuery = query2 + parseInt(laterTarget) + query3 + parseInt(priorTarget)
+        console.log(updatedQuery)
+        connection.query(updatedQuery, function(err, response) {
+            if (err) throw err;
+        })
+        promptUser()
     })
 }
