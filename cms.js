@@ -43,10 +43,13 @@ var questions = {
         "Remove an Employee",
         "Remove a Department",
         "Remove a Role",
+        "Remove Employee's Manager",
         "Update an Employee's ID",
+        "Update Employee's Role",
+        "Update Employee's Manager",
         "Update a Department's ID",
         "Update a Role's ID",
-        "Update Employee Role",
+        "Update a Role's Salary",
         "Exit"
     ],
     name: "userChoice"
@@ -110,8 +113,12 @@ const promptUser = async () => {
                 addRole()
                 break;
 
-            case "Update Employee Role":
+            case "Update Employee's Role":
                 updateEmployeeRole()
+                break;
+
+            case "Update Employee's Manager":
+                updateEmployeeManager()
                 break;
 
             case "Remove an Employee":
@@ -125,6 +132,10 @@ const promptUser = async () => {
             case "Remove a Role":
                 removeRole();
                 break;
+                
+            case "Remove Employee's Manager":
+                removeEmployeeManager();
+                break;
 
             case "Update an Employee's ID":
                 updateEmployeeId();
@@ -136,6 +147,10 @@ const promptUser = async () => {
 
             case "Update a Role's ID":
                 updateRoleId();
+                break;
+
+            case "Update a Role's Salary":
+                updateRoleSalary();
                 break;
 
             case "Exit":
@@ -357,7 +372,7 @@ function updateEmployeeRole() {
     }]).then(function(response) {
         let priorTarget = parseInt(response.priorTarget);
         let laterTarget = parseInt(response.laterTarget);
-        let query2 = "UPDATE employee SET employee.id="
+        let query2 = "UPDATE employee SET employee.role_id="
         let query3 = " WHERE employee.id="
         let updatedQuery = query2 + parseInt(laterTarget) + query3 + parseInt(priorTarget)
         console.log(updatedQuery)
@@ -366,4 +381,80 @@ function updateEmployeeRole() {
         })
         promptUser()
     })
+}
+
+function updateEmployeeManager() {
+    inquirer.prompt([{
+        type: "input",
+        message: "Which Employee do you want to change Manager?",
+        name: "priorTarget"
+    },
+    {
+        type: "input",
+        message: "Which Manager do you want to change to?",
+        name: "laterTarget"
+
+    }]).then(function(response) {
+        let priorTarget = parseInt(response.priorTarget);
+        let laterTarget = parseInt(response.laterTarget);
+        let query2 = "UPDATE employee SET employee.manager_id="
+        let query3 = " WHERE employee.id="
+        let updatedQuery = query2 + parseInt(laterTarget) + query3 + parseInt(priorTarget)
+        console.log(updatedQuery)
+        connection.query(updatedQuery, function(err, response) {
+            if (err) throw err;
+        })
+        promptUser()
+    })
+}
+
+function updateRoleSalary() {
+    inquirer.prompt([{
+        type: "input",
+        message: "Which Role do you want to change Salary?",
+        name: "priorTarget"
+    },
+    {
+        type: "input",
+        message: "Enter new Salary Amount",
+        name: "laterTarget"
+
+    }]).then(function(response) {
+        let priorTarget = parseInt(response.priorTarget);
+        let laterTarget = parseInt(response.laterTarget);
+        let query2 = "UPDATE role SET role.salary="
+        let query3 = " WHERE role.id="
+        let updatedQuery = query2 + parseInt(laterTarget) + query3 + parseInt(priorTarget)
+        console.log(updatedQuery)
+        connection.query(updatedQuery, function(err, response) {
+            if (err) throw err;
+        })
+        promptUser()
+    })
+}
+
+function removeEmployeeManager() {
+    inquirer.prompt({
+        type: "input",
+        message: "Which Employee's manager do you want to Remove?",
+        name: "target"
+    }).then(function(response) {
+        let query = "UPDATE employee SET employee.manager_id=NULL WHERE employee.id="
+        let updatedQuery = query + parseInt(response.target);
+        console.log(updatedQuery)
+        connection.query(updatedQuery, function(err, response) {
+            if (err) throw err;
+        })
+        promptUser()
+    })
+}
+
+function createArray(rows, item) {
+    let list = [];
+
+    for (let i = 0; i < rows.length; i++) {
+        list.push(rows[i][item]);
+    }
+
+    return list;
 }
