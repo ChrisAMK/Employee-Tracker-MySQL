@@ -1,60 +1,4 @@
 const mysql = require("mysql");
-const inquirer = require("inquirer");
-
-var connectionProperties = {
-    host: "localhost",
-    port: 3306,
-    user: "root",
-    password: "",
-    database: "cms"
-}
-
-var connection = mysql.createConnection(connectionProperties)
-
-var roleQuestions = [
-    {
-        type: 'input',
-        name: 'title',
-        message: 'Enter the name of the job title you would like to add:',
-    },
-    {
-        type: 'input',
-        name: 'salary',
-        message: 'What is this salary for this job?',
-    },
-    {
-        type: 'input',
-        name: 'dept',
-        message: 'Select a department where this job belongs to:'
-    }
-]
-
-var questions = {
-    message: "What would you like to do?",
-    type: "list",
-    choices: [
-        "View all Employees",
-        "BIG TEST",
-        "View all Departments",
-        "View all Roles",
-        "Add an Employee",
-        "Add a Department",
-        "Add Role",
-        "Remove an Employee",
-        "Remove a Department",
-        "Remove a Role",
-        "Remove Employee's Manager",
-        "Update an Employee's ID",
-        "Update Employee's Role",
-        "Update Employee's Manager",
-        "Update a Department's ID",
-        "Update a Role's ID",
-        "Update a Role's Salary",
-        "Exit"
-    ],
-    name: "userChoice"
-}
-
 const employeeQuestions = [
     {
         type: "input",
@@ -78,95 +22,33 @@ const employeeQuestions = [
     }
 ]
 
-connection.connect(function (err) {
-    if (err) throw err;
-    console.log("Connected as id " + connection.threadId + "\n")
-    promptUser()
-})
+var roleQuestions = [
+    {
+        type: 'input',
+        name: 'title',
+        message: 'Enter the name of the job title you would like to add:',
+    },
+    {
+        type: 'input',
+        name: 'salary',
+        message: 'What is this salary for this job?',
+    },
+    {
+        type: 'input',
+        name: 'dept',
+        message: 'Select a department where this job belongs to:'
+    }
+]
 
-const promptUser = async () => {
-    inquirer.prompt(questions).then(async function(response) {
-        const {userChoice} = response
-        console.log(userChoice)
-        switch (userChoice) {
-            case "View all Employees":
-                viewAllEmployees()
-                break;
-
-            case "BIG TEST":
-                testRemoveDepartment()
-                break;
-
-            case "View all Departments":
-                viewAllDepartments()
-                break;
-
-            case "View all Roles":
-                viewAllRoles()
-                break;
-
-            case "Add an Employee":
-                addEmployee()
-                break;
-
-            case "Add a Department":
-                addDepartment()
-                break;
-
-            case "Add Role":
-                addRole()
-                break;
-
-            case "Update Employee's Role":
-                updateEmployeeRole()
-                break;
-
-            case "Update Employee's Manager":
-                updateEmployeeManager()
-                break;
-
-            case "Remove an Employee":
-                removeEmployee();
-                break;
-
-            case "Remove a Department":
-                removeDepartment();
-                break;
-
-            case "Remove a Role":
-                removeRole();
-                break;
-                
-            case "Remove Employee's Manager":
-                removeEmployeeManager();
-                break;
-
-            case "Update an Employee's ID":
-                updateEmployeeId();
-                break;
-
-            case "Update a Department's ID":
-                updateDepartmentId();
-                break;
-
-            case "Update a Role's ID":
-                updateRoleId();
-                break;
-
-            case "Update a Role's Salary":
-                updateRoleSalary();
-                break;
-
-            case "Exit":
-                connection.end()
-                break;
-
-            default:
-                connection.end()
-                break;
-        }
-    })
+var connectionProperties = {
+    host: "localhost",
+    port: 3306,
+    user: "root",
+    password: "",
+    database: "cms"
 }
+
+var connection = mysql.createConnection(connectionProperties)
 
 const viewAllEmployees = () => {
     connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, dept.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department dept on role.department_id = dept.id LEFT JOIN employee manager on manager.id = employee.manager_id;", function (err, data) {
@@ -480,15 +362,6 @@ function removeEmployeeManager() {
     })
 }
 
-function createArray(rows, item) {
-    let list = [];
-
-    for (let i = 0; i < rows.length; i++) {
-        list.push(rows[i][item]);
-    }
-
-    return list;
-}
 function testRemoveDepartment() {
 
     connection.query("SELECT department.id, department.name AS department FROM department;", function(err, response) {
@@ -510,7 +383,22 @@ function testRemoveDepartment() {
     })
 }
 
-function makeList() {
-    
+module.exports = {
+    viewAllEmployees: viewAllEmployees,
+    viewAllDepartments: viewAllDepartments,
+    viewAllRoles: viewAllRoles,
+    addEmployee: addEmployee,
+    addDepartment: addDepartment,
+    addRole: addRole,
+    removeEmployee: removeEmployee,
+    removeDepartment: removeDepartment,
+    removeRole: removeRole,
+    updateEmployeeId: updateEmployeeId,
+    updateDepartmentId: updateDepartmentId,
+    updateRoleId: updateRoleId,
+    updateEmployeeRole: updateEmployeeRole,
+    updateEmployeeManager: updateEmployeeManager,
+    updateRoleSalary: updateRoleSalary,
+    removeEmployeeManager: removeEmployeeManager,
+    testRemoveDepartment: testRemoveDepartment,
 }
-// SELECT department.id, department.name AS department FROM department;
