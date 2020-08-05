@@ -1,7 +1,7 @@
+// Requiring all packages for this program
 const mysql = require("mysql");
 const inquirer = require("inquirer");
-const { prompt } = require("inquirer");
-
+// Defining the database connection Properties
 var connectionProperties = {
     host: "localhost",
     port: 3306,
@@ -9,9 +9,9 @@ var connectionProperties = {
     password: "",
     database: "cms"
 }
-
+// Creating a variable to be used everytime we want to make a connection to the database
 var connection = mysql.createConnection(connectionProperties)
-
+// Questions for the inquirer Prompts
 var roleQuestions = [
     {
         type: 'input',
@@ -77,14 +77,30 @@ const employeeQuestions = [
         name: "managerId"
     }
 ]
+                                                                                       
 
+const logo = 
+"              ________  ____________ _                                                           \n"+
+"             / ____/ / / / ____/ __ ( )_____                                                     \n"+
+"            / /   / /_/ / __/ / / / /// ___/                                                     \n"+
+"           / /___/ __  / /___/ /_/ / (__  )                                                      \n"+
+"    ________  _______/ __/_________________________   __________  ___   ________ __ __________   \n"+
+"   / ____/  |/  / __  /     / __  /   ____/ ____/    /_  __/ __    |   / ____/ //_// ____/ __   \n"+
+"  / __/ / /|_/ / /_/ / /   / / / /   / __/ / __/      / / / /_/ / /| |/ /   / ,<  / __/ / /_/ /  \n"+
+" / /___/ /  / / ____/ /___/ /_/ / / / /___/ /___     / / / _, _/ ___ / /___/ /| |/ /___/ _, _/   \n"+
+"/_____/_/  /_/_/   /_____/ ____/ /_/_____/_____/    /_/ /_/ |_/_/  |_ ____/_/ |_/_____/_/ |_|    \n"+
+                                                                              
+
+// This is where the user makes a connection to the Database
 connection.connect(function (err) {
     if (err) throw err;
     console.log("Connected as id " + connection.threadId + "\n")
+    console.log(logo)
     promptUser()
 })
 // This is the starting route for the program, it asks the user what they want to do and executes the appropriate functions
 const promptUser = async () => {
+
     inquirer.prompt(questions).then(async function(response) {
         const {userChoice} = response
         console.log(userChoice)
