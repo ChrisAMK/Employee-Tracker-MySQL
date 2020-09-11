@@ -85,14 +85,14 @@ const logo =
 "            / /   / /_/ / __/ / / / /// ___/                                                     \n"+
 "           / /___/ __  / /___/ /_/ / (__  )                                                      \n"+
 "    ________  _______/ __/_________________________   __________  ___   ________ __ __________   \n"+
-"   / ____/  |/  / __  /     / __  /   ____/ ____/    /_  __/ __    |   / ____/ //_// ____/ __   \n"+
+"   / ____/  |/  / __  /     / __  /   ____/ ____/    /_  __/ __    |   / ____/ //_// ____/ __    \n"+
 "  / __/ / /|_/ / /_/ / /   / / / /   / __/ / __/      / / / /_/ / /| |/ /   / ,<  / __/ / /_/ /  \n"+
 " / /___/ /  / / ____/ /___/ /_/ / / / /___/ /___     / / / _, _/ ___ / /___/ /| |/ /___/ _, _/   \n"+
 "/_____/_/  /_/_/   /_____/ ____/ /_/_____/_____/    /_/ /_/ |_/_/  |_ ____/_/ |_/_____/_/ |_|    \n"+
                                                                               
 
 // This is where the user makes a connection to the Database
-connection.connect(function (err) {
+connection.connect( (err) => {
     if (err) throw err;
     console.log("Connected as id " + connection.threadId + "\n")
     console.log(logo)
@@ -101,7 +101,7 @@ connection.connect(function (err) {
 // This is the starting route for the program, it asks the user what they want to do and executes the appropriate functions
 const promptUser = async () => {
 
-    inquirer.prompt(questions).then(async function(response) {
+    inquirer.prompt(questions).then(async (response) => {
         const {userChoice} = response
         console.log(userChoice)
         switch (userChoice) {
@@ -181,7 +181,7 @@ const promptUser = async () => {
 }
 // This function's main goal is to just execute a SELECT mysql function that joins data from multiple tables together
 const viewAllEmployees = () => {
-    connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, dept.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department dept on role.department_id = dept.id LEFT JOIN employee manager on manager.id = employee.manager_id;", function (err, data) {
+    connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, dept.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department dept on role.department_id = dept.id LEFT JOIN employee manager on manager.id = employee.manager_id;", (err, data) => {
         if (err) {
             console.log(err)
         }
@@ -192,7 +192,7 @@ const viewAllEmployees = () => {
 }
 // This function displays all department information for the user
 const viewAllDepartments = () => {
-    connection.query("SELECT * FROM department", function (err, data) {
+    connection.query("SELECT * FROM department", (err, data) => {
         if (err) {
             console.log(err);
         }
@@ -202,7 +202,7 @@ const viewAllDepartments = () => {
 }
 // This function displays all Role Table Information for the user
 const viewAllRoles = () => {
-    connection.query("SELECT * FROM role", function (err, data) {
+    connection.query("SELECT * FROM role", (err, data) => {
         if (err) {
             console.log(err);
         }
@@ -212,10 +212,10 @@ const viewAllRoles = () => {
 }
 // This Function Inserts into the Employee table the information that the user enters through and inquirer prompt
 const addEmployee = () => {
-    inquirer.prompt(employeeQuestions).then(function(response) {
+    inquirer.prompt(employeeQuestions).then((response) => {
         const {firstName, lastName, roleId, managerId} = response;
         // This is the mysql INSERT INTO function
-        connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [firstName, lastName, roleId, managerId], function(err, data) {
+        connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [firstName, lastName, roleId, managerId], (err, data) => {
             if (err) throw err;
             console.table("Employee inserted into Table")
             promptUser();
@@ -228,8 +228,8 @@ const addDepartment = () => {
         type: "input",
         message: "What is the name of your new Department? ",
         name: "department"
-    }).then(function(response) {
-        connection.query("INSERT INTO department (name) VALUES (?)", response.department, function(err, res) {
+    }).then((response) => {
+        connection.query("INSERT INTO department (name) VALUES (?)", response.department, (err, res) => {
             if (err) throw err;
             console.log("department added!")
             promptUser();
@@ -238,8 +238,8 @@ const addDepartment = () => {
 }
 // This Function adds a new entry into the Role Table, the information is provided by the user through an inquirer Prompt
 const addRole = () => {
-    inquirer.prompt(roleQuestions).then(function(response) {
-        connection.query("INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)", [response.title, response.salary, response.dept], function(err, res) {
+    inquirer.prompt(roleQuestions).then((response) => {
+        connection.query("INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)", [response.title, response.salary, response.dept], (err, res) => {
             if (err) throw err;
             console.log("role added!");
             promptUser();
@@ -248,9 +248,9 @@ const addRole = () => {
 }
 // This function is to Remove a row from the Employee Table, The function starts with a select function that is used to generate an array
 // so that the user can select the employee by their name in a list, instead of having to enter information themselves
-function removeEmployee() {
+const removeEmployee = () => {
     // This is the MySQL call that will return all employees and present the information as one word in the response
-    connection.query("SELECT CONCAT(employee.first_name, ' ',employee.last_name) AS whole_name FROM employee;", function(err, response) {
+    connection.query("SELECT CONCAT(employee.first_name, ' ',employee.last_name) AS whole_name FROM employee;", (err, response) => {
         if (err) throw err;
         let employeeList = [];
         // This for loop, pushes every employee that is found in the above MySQL function into an array that is used in the below inquirer prompt
@@ -263,12 +263,12 @@ function removeEmployee() {
             message: "Which employee do you want to remove? ",
             name: "removedEmployee",
             choices: employeeList
-        }).then(function(response) {
+        }).then((response) => {
             // once the user select from the list which employee they want to remove, their choice can be saved as a variable and then
             // put into a delete query
             let query = "DELETE FROM employee WHERE CONCAT(employee.first_name, ' ', employee.last_name)="
             let updatedQuery = query + `"` + response.removedEmployee + `"`;
-            connection.query(updatedQuery, function(err, response) {
+            connection.query(updatedQuery, (err, response) => {
                 if (err) throw err;
             })
             console.log("Employee Deleted")
@@ -278,9 +278,9 @@ function removeEmployee() {
     })
 }
 // This function is to remove a row from the Department Table
-function removeDepartment() {
+const removeDepartment = () => {
     // This function queries the Database so that an array can be generated for the user to choose from
-    connection.query("SELECT department.id, department.name AS department FROM department;", function(err, response) {
+    connection.query("SELECT department.id, department.name AS department FROM department;", (err, response) => {
         if (err) throw err;
         
         var deptartmentList = [];
@@ -295,11 +295,11 @@ function removeDepartment() {
                 name: "removeDept",
                 choices: deptartmentList
             }
-        ]).then(function(response) {
+        ]).then((response) => {
             // This is the DELETE query that is sent to the Database
             let query = "DELETE FROM department where name=";
             let updatedQuery = query + `"` + response.removeDept + `"`;
-            connection.query(updatedQuery, function(err, result) {
+            connection.query(updatedQuery, (err, result) => {
                 if (err) throw err;
             });
             console.log("Department Removed");
@@ -308,9 +308,9 @@ function removeDepartment() {
     })
 }
 // This function deletes a row from the Role Table
-function removeRole() {
+const removeRole = () => {
     // Every function here and below has the same tactic of querying to make a list
-    connection.query("SELECT role.title FROM role", function(err, response) {
+    connection.query("SELECT role.title FROM role", (err, response) => {
         if (err) throw err;
         let roleList = [];
         for (let i = 0; i < response.length; i++) {
@@ -321,10 +321,10 @@ function removeRole() {
             message: "Which Role do you want to remove?, Select ID",
             name: "removedRole",
             choices: roleList
-        }).then(function(response) {
+        }).then((response) => {
             let query = "DELETE FROM role where role.title=";
             let updatedQuery = query + `"` + response.removedRole + `"`;
-            connection.query(updatedQuery, function(err, response) {
+            connection.query(updatedQuery, (err, response) => {
                 if (err) throw err;
             })
             console.log("Role Removed")
@@ -333,9 +333,9 @@ function removeRole() {
     })
 }
 // This function updates an employee's ID number
-function updateEmployeeId() {
+const updateEmployeeId = () => {
     // This Concat function joins table collumns into a new collumn with a specified name
-    connection.query("SELECT CONCAT(employee.first_name, ' ',employee.last_name) AS whole_name FROM employee;", function(err, response) {
+    connection.query("SELECT CONCAT(employee.first_name, ' ',employee.last_name) AS whole_name FROM employee;", (err, response) => {
         if (err) throw err;
         let employeeList = [];
         for (let i = 0; i < response.length; i++) {
@@ -352,13 +352,13 @@ function updateEmployeeId() {
             message: "What id do you want to change to?",
             name: "laterTarget"
 
-        }]).then(function(response) {
+        }]).then((response) => {
             let priorTarget = response.priorTarget;
             let laterTarget = parseInt(response.laterTarget);
             let query = "UPDATE employee SET employee.id="
             let query2 = " WHERE CONCAT(employee.first_name, ' ',employee.last_name)="
             let updatedQuery = query + laterTarget + query2 + `"` + priorTarget + `"`;
-            connection.query(updatedQuery, function(err, response) {
+            connection.query(updatedQuery, (err, response) => {
                 if (err) throw err;
             })
             promptUser()
@@ -366,8 +366,8 @@ function updateEmployeeId() {
     })
 }
 // This function Updates a Department's ID Number
-function updateDepartmentId() {
-    connection.query("SELECT department.name FROM department", function(err, response) {
+const updateDepartmentId = () => {
+    connection.query("SELECT department.name FROM department", (err, response) => {
         if (err) throw err;
         let deptList = [];
         for (let i = 0; i < response.length; i++) {
@@ -385,14 +385,13 @@ function updateDepartmentId() {
             message: "What id do you want to change to?",
             name: "laterTarget"
 
-        }]).then(function(response) {
+        }]).then((response) => {
             let priorTarget = response.priorTarget;
             let laterTarget = parseInt(response.laterTarget);
             let query = "UPDATE department SET department.id="
             let query2 = " WHERE department.name = "
             let updatedQuery = query + laterTarget + query2 + `"` + priorTarget + `"`
-            console.log(updatedQuery);
-            connection.query(updatedQuery, function(err, response) {
+            connection.query(updatedQuery, (err, response) => {
                 if (err) throw err;
             })
             promptUser()
@@ -400,8 +399,8 @@ function updateDepartmentId() {
     })
 }
 // This Function is to Update a Role's ID Number
-function updateRoleId() {
-    connection.query("SELECT role.title FROM role", function(err, response) {
+const updateRoleId = () => {
+    connection.query("SELECT role.title FROM role", (err, response) => {
         let roleList = [];
         for (i = 0; i < response.length; i++) {
             roleList.push(response[i].title);
@@ -418,14 +417,14 @@ function updateRoleId() {
             message: "What id do you want to change to?",
             name: "laterTarget"
 
-        }]).then(function(response) {
+        }]).then((response) => {
             let chosenRole = response.roleList;
             let laterTarget = parseInt(response.laterTarget);
             let query = "UPDATE role SET role.id="
             let query2 = " WHERE role.title="
             let updatedQuery = query + laterTarget + query2 + `"` + chosenRole + `"`;
             console.log(updatedQuery)
-            connection.query(updatedQuery, function(err) {
+            connection.query(updatedQuery, (err) => {
                 if (err) throw err;
             })
             promptUser()
@@ -433,16 +432,16 @@ function updateRoleId() {
     })
 }
 // This Function is to Change a employee's Existing Role into another
-function updateEmployeeRole() {
+const updateEmployeeRole = () => {
     // This query again is used to generate a list of employees
-    connection.query("SELECT CONCAT(employee.first_name, ' ',employee.last_name) AS whole_name FROM employee;", function(err, response) {
+    connection.query("SELECT CONCAT(employee.first_name, ' ',employee.last_name) AS whole_name FROM employee;", (err, response) => {
         if (err) throw err;
         var employeeList = [];
         for (let i = 0; i < response.length; i++) {
             employeeList.push(response[i].whole_name)
         }
         // Inside one query function we make another to make another list of Possible Roles to Update to
-        connection.query("SELECT role.title FROM role;", function(err, response, employeeList) {
+        connection.query("SELECT role.title FROM role;", (err, response, employeeList) => {
             if (err) throw err;
             let roleList = [];
             for (let i = 0; i < response[i].title; i++) {
@@ -461,12 +460,12 @@ function updateEmployeeRole() {
                 name: "roles",
                 choices: roleList
 
-            }]).then(function(response) {
+            }]).then((response) => {
                 // Setting up variables with the User's choices, Entering those variables into a MySQL query statement
                 let query = "UPDATE employee SET employee.role_id="
                 let query2 = " WHERE employee.id="
                 let updatedQuery = query + response.roles + query2 + response.priorTarget;
-                connection.query(updatedQuery, function(err, response) {
+                connection.query(updatedQuery, (err, response) => {
                     if (err) throw err;
                 })
                 promptUser()
@@ -478,9 +477,9 @@ function updateEmployeeRole() {
 // Return Title string values while the database is set up to take employee.manager_id values as a Integer so the challenge was to
 // Allow the user to have a easy experience selecting the employees and manager as a List but then sending a MySQL query using the 
 // Ids that are linked to the user's chosen Employees and Managers
-function updateEmployeeManager() {
+const updateEmployeeManager = () => {
     // Same employee list tactic as always
-    connection.query("SELECT CONCAT(employee.first_name, ' ',employee.last_name) AS whole_name FROM employee;", function(err, response) {
+    connection.query("SELECT CONCAT(employee.first_name, ' ',employee.last_name) AS whole_name FROM employee;", (err, response) => {
         if (err) throw err;
         var employeeList = [];
         for (let i = 0; i < response.length; i++) {
@@ -492,11 +491,11 @@ function updateEmployeeManager() {
             message: "Which Employee do you want to change Manager?",
             name: "priorTarget",
             choices: employeeList
-        }]).then(function(response) {
+        }]).then((response) => {
             // Here i am querying to get the ID of the chosen Employee from the above Inquirer List Prompt
             let query = "SELECT employee.id FROM employee WHERE CONCAT(employee.first_name, ' ',employee.last_name)="
             updatedQuery = query + `"` + response.priorTarget + `"`;
-            connection.query(updatedQuery, function(err, response) {
+            connection.query(updatedQuery, (err, response) => {
                 if (err) throw err;
                 // Here i am capturing the chosen Employee's ID as a variable to be used in the final MySQL Update Query
                 var firstEmployeeId = response[0].id
@@ -506,17 +505,17 @@ function updateEmployeeManager() {
                     name: "manager",
                     choices: employeeList
                     // Here i am prompting the user to choose who is the Employee's manager
-                }]).then(function(response) {
+                }]).then((response) => {
                     let query = "SELECT employee.id FROM employee WHERE CONCAT(employee.first_name, ' ',employee.last_name)="
                     updatedQuery = query + `"` + response.manager + `"`;
-                    connection.query(updatedQuery, function(err, response) {
+                    connection.query(updatedQuery, (err, response) => {
                         if (err) throw err;
                         // Here i am capturing the chosen manager's id so it can be used the the Update Query
                         let managerId = response[0].id
                         let query = "UPDATE employee SET employee.manager_id="
                         let query2 = " WHERE employee.id="
                         let updatedQuery = query + managerId + query2 + firstEmployeeId
-                        connection.query(updatedQuery, function(err, response) {
+                        connection.query(updatedQuery, (err, response) => {
                             if (err) throw err;
                         })
                         console.log("Employee's Manager Updated")
@@ -528,9 +527,9 @@ function updateEmployeeManager() {
     })
 }
 // This function updates a Role's Salary
-function updateRoleSalary() {
+const updateRoleSalary = () => {
 // Same list generation code here
-    connection.query("SELECT role.title FROM role", function(err, response) {
+    connection.query("SELECT role.title FROM role", (err, response) => {
         if (err) throw err;
 
         roleList = [];
@@ -547,14 +546,14 @@ function updateRoleSalary() {
             type: "input",
             message: "Enter new Salary Amount",
             name: "laterTarget"
-        }]).then(function(response) {
+        }]).then((response) => {
             let priorTarget = response.priorTarget;
             let laterTarget = parseInt(response.laterTarget);
             let query = "UPDATE role SET role.salary="
             let query2 = " WHERE role.title="
             let updatedQuery = query + laterTarget + query2 + `"` + priorTarget + `"`
             console.log(updatedQuery)
-            connection.query(updatedQuery, function(err, response) {
+            connection.query(updatedQuery, (err, response) => {
                 if (err) throw err;
             })
             console.log("Salary Updated")
@@ -563,8 +562,8 @@ function updateRoleSalary() {
     })
 }
 // This function removes the Manager of an Employee
-function removeEmployeeManager() {
-    connection.query("SELECT CONCAT(employee.first_name, ' ',employee.last_name) AS whole_name FROM employee;", function(err, response) {
+const removeEmployeeManager = () => {
+    connection.query("SELECT CONCAT(employee.first_name, ' ',employee.last_name) AS whole_name FROM employee;", (err, response) => {
         if (err) throw err;
         let employeeList = [];
         for (let i = 0; i < response.length; i++) {
@@ -576,11 +575,11 @@ function removeEmployeeManager() {
             name: "employee",
             choices: employeeList
 
-        }).then(function(response) {
+        }).then((response) => {
             let query = "UPDATE employee SET employee.manager_id=NULL WHERE employee.title="
             let updatedQuery = query + response.employee;
             console.log(updatedQuery)
-            connection.query(updatedQuery, function(err, response) {
+            connection.query(updatedQuery, (err, response) => {
                 if (err) throw err;
             })
             promptUser()
