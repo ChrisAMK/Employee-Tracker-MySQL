@@ -12,7 +12,7 @@ Employee Track is a command line application where users can manage the departme
 * [Questions](#Questions)
 
 ## Installation <a name='Installation'></a> 
-Since this is a simple command line application, it is easiest to download this repo, and with node installed on your machine, you enter into your shell "node index.js" while in the right working Directory
+Since this is a simple command line application, it is easiest to download this repo, and with node installed on your machine, you enter into your shell "node cms.js" while in the right working Directory
 
 ## Usage <a name='Usage'></a> 
 This Application is intended to be Used as a tool for someone of a management position in a store to allocate employees to their appropriate roles within departments indicate who is someone's supervisor
